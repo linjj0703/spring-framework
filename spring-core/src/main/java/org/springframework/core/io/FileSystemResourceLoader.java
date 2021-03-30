@@ -56,6 +56,8 @@ public class FileSystemResourceLoader extends DefaultResourceLoader {
 
 
 	/**
+	 * @see FileSystemResource extends AbstractResource
+	 *
 	 * FileSystemResource that explicitly expresses a context-relative path
 	 * through implementing the ContextResource interface.
 	 */

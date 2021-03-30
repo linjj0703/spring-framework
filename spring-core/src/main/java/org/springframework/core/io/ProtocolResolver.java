@@ -33,6 +33,8 @@ import org.springframework.lang.Nullable;
 public interface ProtocolResolver {
 
 	/**
+	 *  使用指定的 ResourceLoader ，解析指定的 location 。
+	 *  若成功，则返回对应的 Resource 。
 	 * Resolve the given location against the given resource loader
 	 * if this implementation's protocol matches.
 	 * @param location the user-specified resource location

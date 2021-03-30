@@ -19,7 +19,8 @@ package org.springframework.core.io;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
-/**
+/**ClassRelativeResourceLoader 扩展的功能是，可以根据给定的class 所在包或者所在包的子包下加载资源。
+ *
  * {@link ResourceLoader} implementation that interprets plain resource paths
  * as relative to a given {@code java.lang.Class}.
  *

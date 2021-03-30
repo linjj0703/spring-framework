@@ -16,10 +16,10 @@
 
 package org.springframework.core.io.support;
 
-import java.io.IOException;
-
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+
+import java.io.IOException;
 
 /**
  * Strategy interface for resolving a location pattern (for example,
@@ -55,7 +55,7 @@ import org.springframework.core.io.ResourceLoader;
  */
 public interface ResourcePatternResolver extends ResourceLoader {
 
-	/**
+	/**同时，也新增了一种新的协议前缀 "classpath*:"，该协议前缀由其子类负责实现。
 	 * Pseudo URL prefix for all matching resources from the class path: "classpath*:"
 	 * <p>This differs from ResourceLoader's classpath URL prefix in that it
 	 * retrieves all matching resources for a given name (e.g. "/beans.xml"),
@@ -64,7 +64,8 @@ public interface ResourcePatternResolver extends ResourceLoader {
 	 */
 	String CLASSPATH_ALL_URL_PREFIX = "classpath*:";
 
-	/**
+	/**支持根据路径匹配模式返回多个 Resource 实例
+	 *
 	 * Resolve the given location pattern into {@code Resource} objects.
 	 * <p>Overlapping resource entries that point to the same physical
 	 * resource should be avoided, as far as possible. The result should
