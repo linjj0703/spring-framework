@@ -16,14 +16,13 @@
 
 package org.springframework.beans.factory.xml;
 
-import java.io.IOException;
-
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
+import java.io.IOException;
 
 /**
  * {@link EntityResolver} implementation that delegates to a {@link BeansDtdResolver}
@@ -76,16 +75,27 @@ public class DelegatingEntityResolver implements EntityResolver {
 		this.schemaResolver = schemaResolver;
 	}
 
-
+	/**
+	 * 如果是 DTD 验证模式，则使用 BeansDtdResolver 来进行解析
+	 * 如果是 XSD 验证模式，则使用 PluggableSchemaResolver 来进行解析。
+	 *
+	 * @param publicId
+	 * @param systemId
+	 * @return
+	 * @throws SAXException
+	 * @throws IOException
+	 */
 	@Override
 	@Nullable
 	public InputSource resolveEntity(@Nullable String publicId, @Nullable String systemId)
 			throws SAXException, IOException {
 
 		if (systemId != null) {
+			// DTD 验证模式
 			if (systemId.endsWith(DTD_SUFFIX)) {
 				return this.dtdResolver.resolveEntity(publicId, systemId);
 			}
+			// XSD 验证模式
 			else if (systemId.endsWith(XSD_SUFFIX)) {
 				return this.schemaResolver.resolveEntity(publicId, systemId);
 			}

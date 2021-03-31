@@ -16,14 +16,10 @@
 
 package org.springframework.util.xml;
 
-import java.io.BufferedReader;
-import java.io.CharConversionException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
+
+import java.io.*;
 
 /**
  * Detects whether an XML stream is using DTD- or XSD-based validation.
@@ -80,7 +76,7 @@ public class XmlValidationModeDetector {
 	private boolean inComment;
 
 
-	/**
+	/** XML 验证模式探测器
 	 * Detect the validation mode for the XML document in the supplied {@link InputStream}.
 	 * Note that the supplied {@link InputStream} is closed by this method before returning.
 	 * @param inputStream the InputStream to parse
@@ -89,27 +85,42 @@ public class XmlValidationModeDetector {
 	 * @see #VALIDATION_XSD
 	 */
 	public int detectValidationMode(InputStream inputStream) throws IOException {
+		/**
+		 * <0> 处，从代码中看，主要是通过读取 XML 文件的内容，来进行自动判断。
+		 * <1> 处，调用 #hasDoctype(String content) 方法，判断内容中如果包含有 "DOCTYPE“ ，则为 DTD 验证模式。
+		 * <2> 处，调用 #hasOpeningTag(String content) 方法，判断如果这一行包含 < ，并且 < 紧跟着的是字幕，则为 XSD 验证模式。
+		 * <3> 处，如果发生 CharConversionException 异常，则为 VALIDATION_AUTO 模式。
+		 * 关于 #consumeCommentTokens(String content) 方法，代码比较复杂。
+		 */
 		// Peek into the file to look for DOCTYPE.
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+			// 是否为 DTD 校验模式。默认为，非 DTD 模式，即 XSD 模式
 			boolean isDtdValidated = false;
 			String content;
+			// <0> 循环，逐行读取 XML 文件的内容
 			while ((content = reader.readLine()) != null) {
+				// 使用给定字符串中的所有前导注释和尾随注释，并返回剩余的内容，该内容可能为空，因为提供的内容可能都是注释数据。
 				content = consumeCommentTokens(content);
+				// 跳过，如果是注释，或者
 				if (this.inComment || !StringUtils.hasText(content)) {
 					continue;
 				}
+				// <1> 包含 DOCTYPE 为 DTD 模式
 				if (hasDoctype(content)) {
 					isDtdValidated = true;
 					break;
 				}
+				// <2>  hasOpeningTag 方法会校验，如果这一行有 < ，并且 < 后面跟着的是字母，则返回 true 。
 				if (hasOpeningTag(content)) {
 					// End of meaningful data...
 					break;
 				}
 			}
+			// 返回 VALIDATION_DTD or VALIDATION_XSD 模式
 			return (isDtdValidated ? VALIDATION_DTD : VALIDATION_XSD);
 		}
 		catch (CharConversionException ex) {
+			// <3> 返回 VALIDATION_AUTO 模式
 			// Choked on some character encoding...
 			// Leave the decision up to the caller.
 			return VALIDATION_AUTO;
@@ -119,6 +130,8 @@ public class XmlValidationModeDetector {
 
 	/**
 	 * Does the content contain the DTD DOCTYPE declaration?
+	 *
+	 * private static final String DOCTYPE = "DOCTYPE";
 	 */
 	private boolean hasDoctype(String content) {
 		return content.contains(DOCTYPE);
@@ -134,8 +147,10 @@ public class XmlValidationModeDetector {
 			return false;
 		}
 		int openTagIndex = content.indexOf('<');
-		return (openTagIndex > -1 && (content.length() > openTagIndex + 1) &&
-				Character.isLetter(content.charAt(openTagIndex + 1)));
+		return (openTagIndex > -1  // < 存在
+				&& (content.length() > openTagIndex + 1)   // < 后面还有内容
+				&& Character.isLetter(content.charAt(openTagIndex + 1))   // < 后面的内容是字幕
+		);
 	}
 
 	/**
