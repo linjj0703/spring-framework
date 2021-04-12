@@ -18,6 +18,7 @@ package org.springframework.beans.factory.config;
 
 import org.springframework.beans.BeanMetadataElement;
 import org.springframework.beans.MutablePropertyValues;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.core.AttributeAccessor;
 import org.springframework.core.ResolvableType;
 import org.springframework.lang.Nullable;
@@ -37,6 +38,21 @@ import org.springframework.lang.Nullable;
  * @see ConfigurableListableBeanFactory#getBeanDefinition
  * @see org.springframework.beans.factory.support.RootBeanDefinition
  * @see org.springframework.beans.factory.support.ChildBeanDefinition
+ *
+ * BeanDefinition 继承 AttributeAccessor 和 BeanMetadataElement 接口。
+ * @see org.springframework.core.AttributeAccessor 接口，定义了与其它对象的（元数据）进行连接和访问的约定，即对属性的修改，包括获取、设置、删除。
+ * @see org.springframework.beans.BeanMetadataElement 接口，Bean 元对象持有的配置元素可以通过 #getSource() 方法来获取。
+ *
+ * 我们常用的三个实现类有：
+ * @see org.springframework.beans.factory.support.ChildBeanDefinition
+ * @see org.springframework.beans.factory.support.RootBeanDefinition
+ * @see org.springframework.beans.factory.support.GenericBeanDefinition
+ *ChildBeanDefinition、RootBeanDefinition、GenericBeanDefinition 三者都继承 AbstractBeanDefinition 抽象类，
+ *@see AbstractBeanDefinition 即是对三个子类的共同的类信息进行抽象。
+ * 如果配置文件中定义了父 <bean> 和 子 <bean> ，
+ * 则父 <bean> 用 RootBeanDefinition 表示，子 <bean> 用 ChildBeanDefinition 表示，而没有父 <bean> 的就使用RootBeanDefinition 表示。
+ * GenericBeanDefinition 为一站式服务类。
+ *
  */
 public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 
@@ -149,6 +165,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	boolean isLazyInit();
 
 	/**
+	 * 设置依赖的bean
 	 * Set the names of the beans that this bean depends on being initialized.
 	 * The bean factory will guarantee that these beans get initialized first.
 	 */
