@@ -576,7 +576,7 @@ public class BeanDefinitionParserDelegate {
 			parseReplacedMethodSubElements(ele, bd.getMethodOverrides());
 
 			// 解析构造函数参数 <constructor-arg />
-			parseConstructorArgElements(ele, bd);
+			parseConstructorArgElements(ele, bd);BeanDefinitionReaderUtils
 
 			// 解析 property 子元素 <property />
 			parsePropertyElements(ele, bd);
